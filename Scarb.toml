@@ -1,12 +1,13 @@
 [package]
-name = "push_coom"
+name = "push_comm"
 version = "0.1.0"
 edition = "2023_11"
 
 # See more keys and their definitions at https://docs.swmansion.com/scarb/docs/reference/manifest.html
 
 [dependencies]
-starknet = "2.6.4"
+starknet = "2.7.0-rc.3"
+openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", rev="49816b6763fea500396a97b5178c3e30a85eecc7" }
 
 [dev-dependencies]
 snforge_std = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.27.0" }

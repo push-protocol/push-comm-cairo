@@ -2,9 +2,15 @@
 version = 1
 
 [[package]]
-name = "push_coom"
+name = "openzeppelin"
+version = "0.15.0-rc.0"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?rev=49816b6763fea500396a97b5178c3e30a85eecc7#49816b6763fea500396a97b5178c3e30a85eecc7"
+
+[[package]]
+name = "push_comm"
 version = "0.1.0"
 dependencies = [
+ "openzeppelin",
  "snforge_std",
 ]
 
