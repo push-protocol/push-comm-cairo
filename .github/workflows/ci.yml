@@ -1,27 +1,41 @@
-name: CI
+name: Lint and Build
 
 on:
-  workflow_dispatch:
+  pull_request:
+    branches:
+    - main
   push:
     branches:
-      - main
-  pull_request:
-permissions: read-all
+    - main
 
 jobs:
-  check:
+  lin:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: software-mansion/setup-scarb@v1
-      - name: Check cairo format
-        run: scarb fmt --check
-
+    - uses: actions/checkout@v3
+    - name: Extract scarb version
+      run: |
+        SCARB_VERSION=$(grep 'scarb-version = ' Scarb.toml | sed 's/scarb-version = "\(.*\)"/\1/')
+        echo "SCARB_VERSION=$SCARB_VERSION" >> $GITHUB_ENV
+    - uses: software-mansion/setup-scarb@v1
+      with:
+        scarb-version: ${{ env.SCARB_VERSION }}
+    - name: Cairo lint
+      run: scarb fmt --check
+  
   test:
+    name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: software-mansion/setup-scarb@v1
-      - uses: foundry-rs/setup-snfoundry@v3
-      - name: Test cairo contract
-        run: scarb test
+    - uses: actions/checkout@v3
+    - name: Extract scarb version
+      run: |
+        SCARB_VERSION=$(grep 'scarb-version = ' Scarb.toml | sed 's/scarb-version = "\(.*\)"/\1/')
+        echo "SCARB_VERSION=$SCARB_VERSION" >> $GITHUB_ENV
+    - uses: software-mansion/setup-scarb@v1
+      with:
+        scarb-version: ${{ env.SCARB_VERSION }}
+    - uses: foundry-rs/setup-snfoundry@v3
+    - name: Cairo Build
+      run: scarb build
