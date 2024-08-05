@@ -129,6 +129,5 @@ pub mod PushComm {
         fn get_push_token_address(self: @ContractState) -> felt252 {
             self.push_token_address.read()
         }
-
     }
 }
