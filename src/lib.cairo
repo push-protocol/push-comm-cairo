@@ -1,5 +1,8 @@
+use starknet::ContractAddress;
+
 #[starknet::interface]
 pub trait IPushComm<TContractState> {
+    // Push Admin
     fn complete_migration(ref self: TContractState);
     fn get_migration_status(self: @TContractState) -> bool;
     fn set_push_core_address(ref self: TContractState, core_address: felt252);
@@ -100,7 +103,13 @@ pub mod PushComm {
         }
 
         fn verify_channel_alias(ref self: ContractState, channel_address: felt252) {
-            self.emit(ChannelAlias { channel_owner_address: self.owner(), ethereum_channel_address: channel_address });
+            self
+                .emit(
+                    ChannelAlias {
+                        channel_owner_address: self.owner(),
+                        ethereum_channel_address: channel_address
+                    }
+                );
         }
 
         fn set_push_governance_address(ref self: ContractState, governance_address: felt252) {
@@ -120,5 +129,6 @@ pub mod PushComm {
         fn get_push_token_address(self: @ContractState) -> felt252 {
             self.push_token_address.read()
         }
+
     }
 }
