@@ -2,8 +2,8 @@
 pub trait IPushComm<TContractState> {}
 
 #[starknet::contract]
-pub mod MyContract {
-    use starknet::storage::Map;
+pub mod PushComm {
+    use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
     use starknet::ContractAddress;
     use openzeppelin::access::ownable::OwnableComponent;
 
@@ -17,14 +17,31 @@ pub mod MyContract {
 
     #[storage]
     struct Storage {
+        // Ownable
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
-        user: User,
+        // Users
+        users: Map<ContractAddress, User>,
+        users_count: u256,
+        map_address_users: u256,
+        user_to_channel_notifs: Map<ContractAddress, Map<ContractAddress, ByteArray>>,
+        // Channels
+        delegatedNotificationSenders: Map<ContractAddress, bool>,
+        // Contract State
+        governance: ContractAddress,
+        is_migration_complete: bool,
+        push_core_address: ContractAddress
     }
 
-    #[derive(Drop, Serde, starknet::Store)]
+    #[starknet::storage_node]
     pub struct User {
-        count: u256,
+        is_activated: bool,
+        is_public_key_registered: bool,
+        start_block: u256,
+        subscribed_count: u256,
+        is_subscribed: Map<ContractAddress, u8>,
+        subscribed: Map<ContractAddress, u8>,
+        map_address_subscribed: Map<ContractAddress, u8>,
     }
 
     #[event]
