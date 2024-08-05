@@ -20,29 +20,25 @@ pub mod PushComm {
         // Ownable
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
-        
         // Users
-        users: Map<ContractAddress,User>,
-        users_count:u256,
-        map_address_users:u256,
-        user_to_channel_notifs:Map<ContractAddress, Map<ContractAddress, ByteArray>>,
-        
+        users: Map<ContractAddress, User>,
+        users_count: u256,
+        map_address_users: u256,
+        user_to_channel_notifs: Map<ContractAddress, Map<ContractAddress, ByteArray>>,
         // Channels
-        delegatedNotificationSenders:Map<ContractAddress, bool>,
-
-
+        delegatedNotificationSenders: Map<ContractAddress, bool>,
         // Contract State
         governance: ContractAddress,
         is_migration_complete: bool,
-        push_core_address:ContractAddress
+        push_core_address: ContractAddress
     }
 
     #[starknet::storage_node]
     pub struct User {
-        is_activated:bool,
-        is_public_key_registered:bool,
-        start_block:u256,
-        subscribed_count:u256,
+        is_activated: bool,
+        is_public_key_registered: bool,
+        start_block: u256,
+        subscribed_count: u256,
         is_subscribed: Map<ContractAddress, u8>,
         subscribed: Map<ContractAddress, u8>,
         map_address_subscribed: Map<ContractAddress, u8>,
