@@ -9,7 +9,7 @@ on:
     - main
 
 jobs:
-  lin:
+  lint:
     name: Lint
     runs-on: ubuntu-latest
     steps:
@@ -24,7 +24,7 @@ jobs:
     - name: Cairo lint
       run: scarb fmt --check
   
-  test:
+  build:
     name: Build
     runs-on: ubuntu-latest
     steps:
@@ -39,3 +39,19 @@ jobs:
     - uses: foundry-rs/setup-snfoundry@v3
     - name: Cairo Build
       run: scarb build
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Extract scarb version
+      run: |
+        SCARB_VERSION=$(grep 'scarb-version = ' Scarb.toml | sed 's/scarb-version = "\(.*\)"/\1/')
+        echo "SCARB_VERSION=$SCARB_VERSION" >> $GITHUB_ENV
+    - uses: software-mansion/setup-scarb@v1
+      with:
+        scarb-version: ${{ env.SCARB_VERSION }}
+    - uses: foundry-rs/setup-snfoundry@v3
+    - name: Cairo Test
+      run: scarb test
