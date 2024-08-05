@@ -1,8 +1,15 @@
 #[starknet::interface]
-pub trait IPushComm<TContractState> {}
+pub trait IPushComm<TContractState> {
+    fn complete_migration(ref self: TContractState);
+    fn get_migration_status(self: @TContractState) -> bool;
+    fn set_push_core_address(ref self: TContractState, core_address: felt252);
+    fn get_push_core_address(self: @TContractState) -> felt252;
+}
 
 #[starknet::contract]
 pub mod PushComm {
+    use openzeppelin::access::ownable::interface::OwnableABI;
+    use core::starknet::storage::StoragePointerWriteAccess;
     use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
     use starknet::ContractAddress;
     use openzeppelin::access::ownable::OwnableComponent;
@@ -30,7 +37,7 @@ pub mod PushComm {
         // Contract State
         governance: ContractAddress,
         is_migration_complete: bool,
-        push_core_address: ContractAddress
+        push_core_address: felt252
     }
 
     #[starknet::storage_node]
@@ -59,5 +66,23 @@ pub mod PushComm {
 
 
     #[abi(embed_v0)]
-    impl PushComm of super::IPushComm<ContractState> {}
+    impl PushComm of super::IPushComm<ContractState> {
+        fn complete_migration(ref self: ContractState) {
+            self.ownable.assert_only_owner();
+            self.is_migration_complete.write(true);
+        }
+
+        fn get_migration_status(self: @ContractState) -> bool {
+            self.is_migration_complete.read()
+        }
+
+        fn set_push_core_address(ref self: ContractState, core_address: felt252) {
+            self.ownable.assert_only_owner();
+            self.push_core_address.write(core_address);
+        }
+
+        fn get_push_core_address(self: @ContractState) -> felt252 {
+            self.push_core_address.read()
+        }
+    }
 }
