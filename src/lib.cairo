@@ -19,7 +19,7 @@ pub mod PushComm {
     use openzeppelin::access::ownable::interface::OwnableABI;
     use core::starknet::storage::StoragePointerWriteAccess;
     use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
-    use starknet::ContractAddress;
+    use starknet::{ContractAddress, get_caller_address};
     use openzeppelin::access::ownable::OwnableComponent;
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
@@ -46,7 +46,10 @@ pub mod PushComm {
         governance: felt252,
         is_migration_complete: bool,
         push_core_address: felt252,
-        push_token_address: felt252
+        push_token_address: felt252,
+        // Chain Info
+        chain_name: felt252,
+        chain_id: felt252,
     }
 
     #[starknet::storage_node]
@@ -62,23 +65,29 @@ pub mod PushComm {
 
     #[event]
     #[derive(Drop, starknet::Event)]
-    enum Event {
+    pub enum Event {
         #[flat]
         OwnableEvent: OwnableComponent::Event,
         ChannelAlias: ChannelAlias
     }
 
     #[derive(Drop, starknet::Event)]
-    struct ChannelAlias {
+    pub struct ChannelAlias {
         #[key]
-        channel_owner_address: ContractAddress,
-        ethereum_channel_address: felt252,
+        pub chain_name: felt252,
+        pub chain_id: felt252,
+        pub channel_owner_address: ContractAddress,
+        pub ethereum_channel_address: felt252,
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, owner: ContractAddress) {
+    fn constructor(
+        ref self: ContractState, owner: ContractAddress, chain_id: felt252, chain_name: felt252
+    ) {
         // Set the initial owner of the contract
         self.ownable.initializer(owner);
+        self.chain_id.write(chain_id);
+        self.chain_name.write(chain_name);
     }
 
 
@@ -106,7 +115,9 @@ pub mod PushComm {
             self
                 .emit(
                     ChannelAlias {
-                        channel_owner_address: self.owner(),
+                        chain_name: self.chain_name.read(),
+                        chain_id: self.chain_id.read(),
+                        channel_owner_address: get_caller_address(),
                         ethereum_channel_address: channel_address
                     }
                 );
