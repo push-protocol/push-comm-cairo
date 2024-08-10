@@ -119,6 +119,14 @@ pub mod PushComm {
         #[key]
         pub channel: ContractAddress,
         pub delegate: ContractAddress,
+    
+    #[derive(Drop, starknet::Event)]
+    pub struct ChannelAlias {
+        #[key]
+        pub chain_name: felt252,
+        pub chain_id: felt252,
+        pub channel_owner_address: ContractAddress,
+        pub ethereum_channel_address: felt252,
     }
 
     #[derive(Drop, starknet::Event)]
