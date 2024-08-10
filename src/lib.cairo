@@ -15,6 +15,18 @@ pub trait IPushComm<TContractState> {
     fn verify_channel_alias(ref self: TContractState, channel_address: felt252);
     fn add_delegate(ref self: TContractState, delegate: ContractAddress);
     fn remove_delegate(ref self: TContractState, delegate: ContractAddress);
+    fn send_notification(
+        ref self: TContractState,
+        channel: ContractAddress,
+        recipient: ContractAddress,
+        identity: ByteArray
+    ) -> bool;
+    fn change_user_channel_settings(
+        ref self: TContractState,
+        channel: ContractAddress,
+        notif_id: u256,
+        notif_settings: ByteArray
+    );
     // User
     fn is_user_subscribed(
         self: @TContractState, channel: ContractAddress, user: ContractAddress
@@ -27,6 +39,8 @@ pub trait IPushComm<TContractState> {
 
 #[starknet::contract]
 pub mod PushComm {
+    use core::clone::Clone;
+    use core::num::traits::zero::Zero;
     use push_comm::IPushComm;
     use core::starknet::event::EventEmitter;
     use core::starknet::storage::MutableStorageNode;
@@ -89,6 +103,8 @@ pub mod PushComm {
         UnSubscribe: UnSubscribe,
         AddDelegate: AddDelegate,
         RemoveDelegate: RemoveDelegate,
+        SendNotification: SendNotification,
+        UserNotifcationSettingsAdded: UserNotifcationSettingsAdded
     }
 
     #[derive(Drop, starknet::Event)]
@@ -126,6 +142,23 @@ pub mod PushComm {
         #[key]
         pub channel: ContractAddress,
         pub delegate: ContractAddress,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    pub struct SendNotification {
+        #[key]
+        pub channel: ContractAddress,
+        pub recipient: ContractAddress,
+        pub indentity: ByteArray,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    pub struct UserNotifcationSettingsAdded {
+        #[key]
+        pub channel: ContractAddress,
+        pub recipient: ContractAddress,
+        pub notif_id: u256,
+        pub notif_settings: ByteArray,
     }
 
 
@@ -194,6 +227,40 @@ pub mod PushComm {
                 self.users_count.write(user_count + 1);
             }
         }
+
+        fn _check_notifi_req(
+            self: @ContractState, channel: ContractAddress, recipient: ContractAddress
+        ) -> bool {
+            let caller_address = get_caller_address();
+            let is_admin = self.ownable.owner() == caller_address;
+
+            if (channel.is_zero() && is_admin)
+                || (channel == caller_address)
+                || self.delegatedNotificationSenders.entry(channel).entry(caller_address).read() {
+                return true;
+            }
+
+            false
+        }
+
+        fn _send_notification(
+            ref self: ContractState,
+            channel: ContractAddress,
+            recipient: ContractAddress,
+            indentity: ByteArray
+        ) -> bool {
+            let success = self._check_notifi_req(channel, recipient);
+            if success {
+                self
+                    .emit(
+                        SendNotification {
+                            channel: channel, recipient: recipient, indentity: indentity
+                        }
+                    )
+            }
+
+            false
+        }
     }
 
 
@@ -224,6 +291,32 @@ pub mod PushComm {
             for channel in channels {
                 self._unsubscribe(channel, get_caller_address());
             }
+        }
+
+        fn change_user_channel_settings(
+            ref self: ContractState,
+            channel: ContractAddress,
+            notif_id: u256,
+            notif_settings: ByteArray
+        ) {
+            let caller_address = get_caller_address();
+            assert!(self._is_user_subscribed(channel, caller_address));
+
+            let modified_notif_settings = format!("@{}+@{}", notif_id, notif_settings);
+            self
+                .user_to_channel_notifs
+                .entry(caller_address)
+                .write(channel, modified_notif_settings);
+
+            self
+                .emit(
+                    UserNotifcationSettingsAdded {
+                        channel: channel,
+                        recipient: caller_address,
+                        notif_id: notif_id,
+                        notif_settings: notif_settings
+                    }
+                );
         }
 
 
@@ -269,6 +362,15 @@ pub mod PushComm {
             let channel = get_caller_address();
             self.delegatedNotificationSenders.entry(channel).write(delegate, false);
             self.emit(RemoveDelegate { channel: channel, delegate: delegate });
+        }
+
+        fn send_notification(
+            ref self: ContractState,
+            channel: ContractAddress,
+            recipient: ContractAddress,
+            identity: ByteArray
+        ) -> bool {
+            self._send_notification(channel, recipient, identity)
         }
 
 
