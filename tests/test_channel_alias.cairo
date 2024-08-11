@@ -4,7 +4,7 @@ use snforge_std::{
     declare, ContractClassTrait, cheat_caller_address, CheatSpan, spy_events,
     EventSpyAssertionsTrait, Event, EventSpyTrait
 };
-use push_comm::{PushComm, IPushCommDispatcher, IPushCommDispatcherTrait};
+use push_comm::{PushComm, interface::IPushCommDispatcher, interface::IPushCommDispatcherTrait};
 use super::common::{USER_1, deploy_contract, CHAIN_NAME, CHAIN_ID};
 
 #[test]

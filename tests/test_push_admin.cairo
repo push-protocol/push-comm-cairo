@@ -1,7 +1,7 @@
 use starknet::ContractAddress;
 
 use snforge_std::{declare, ContractClassTrait, cheat_caller_address, CheatSpan, spy_events};
-use push_comm::{IPushCommDispatcher, IPushCommDispatcherTrait};
+use push_comm::interface::{IPushCommDispatcher, IPushCommDispatcherTrait};
 use super::common::{PUSH_ADMIN, deploy_contract};
 
 #[test]
