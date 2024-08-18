@@ -1,32 +1,15 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress, EthAddress};
 
 use snforge_std::{declare, ContractClassTrait, cheat_caller_address, CheatSpan, spy_events};
 use push_comm::interface::{IPushCommDispatcher, IPushCommDispatcherTrait};
 use super::common::{PUSH_ADMIN, deploy_contract};
-
-#[test]
-fn test_migration_status() {
-    let contract_address = deploy_contract();
-    let push_comm = IPushCommDispatcher { contract_address };
-
-    let migration_status = push_comm.get_migration_status();
-    assert(migration_status == false, 'Initial migration set to false');
-
-    // admin sets the migration status
-    cheat_caller_address(contract_address, PUSH_ADMIN(), CheatSpan::TargetCalls(1));
-    push_comm.complete_migration();
-
-    let migration_status = push_comm.get_migration_status();
-    assert(migration_status == true, 'Migration status not updated');
-}
 
 
 #[test]
 fn test_core_contract_address() {
     let contract_address = deploy_contract();
     let push_comm = IPushCommDispatcher { contract_address };
-
-    let CORE_ADDRESS: felt252 = 'some addrs';
+    let CORE_ADDRESS: EthAddress = 'some addrs'.try_into().unwrap();
 
     // admin sets the core channel address
     cheat_caller_address(contract_address, PUSH_ADMIN(), CheatSpan::TargetCalls(1));

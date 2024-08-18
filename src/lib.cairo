@@ -1,6 +1,6 @@
 pub mod interface;
 
-use starknet::ContractAddress;
+use starknet::{ContractAddress};
 pub use interface::IPushComm;
 
 
@@ -17,7 +17,7 @@ pub mod PushComm {
     use openzeppelin::access::ownable::interface::OwnableABI;
     use core::starknet::storage::StoragePointerWriteAccess;
     use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
-    use starknet::{ContractAddress, get_caller_address};
+    use starknet::{ContractAddress, get_caller_address, EthAddress};
     use starknet::{get_execution_info};
     use openzeppelin::access::ownable::OwnableComponent;
 
@@ -44,7 +44,7 @@ pub mod PushComm {
         // Contract State
         governance: ContractAddress,
         is_migration_complete: bool,
-        push_core_address: felt252,
+        push_core_address: EthAddress,
         push_token_address: ContractAddress,
         // Chain Info
         chain_name: felt252,
@@ -54,8 +54,8 @@ pub mod PushComm {
     #[starknet::storage_node]
     pub struct User {
         is_activated: bool,
-        is_public_key_registered: bool,
-        start_block: u256,
+        // TODO: optimized packing
+        start_block: u64,
         subscribed_count: u256,
         is_subscribed: Map<ContractAddress, bool>,
         subscribed: Map<ContractAddress, u256>,
@@ -193,8 +193,9 @@ pub mod PushComm {
             let user_info = self.users.entry(user).storage_node_mut();
 
             if !user_info.is_activated.read() {
+                let block_number = get_execution_info().unbox().block_info.unbox().block_number;
                 user_info.is_activated.write(true);
-                user_info.start_block.write(1);
+                user_info.start_block.write(block_number);
 
                 let user_count = self.users_count.read();
                 self.map_address_users.write(user_count, user);
@@ -202,7 +203,7 @@ pub mod PushComm {
             }
         }
 
-        fn _check_notifi_req(
+        fn _check_notif_req(
             self: @ContractState, channel: ContractAddress, recipient: ContractAddress
         ) -> bool {
             let caller_address = get_caller_address();
@@ -223,7 +224,7 @@ pub mod PushComm {
             recipient: ContractAddress,
             indentity: ByteArray
         ) -> bool {
-            let success = self._check_notifi_req(channel, recipient);
+            let success = self._check_notif_req(channel, recipient);
             if success {
                 self
                     .emit(
@@ -295,21 +296,12 @@ pub mod PushComm {
 
 
         // Admin
-        fn complete_migration(ref self: ContractState) {
-            self.ownable.assert_only_owner();
-            self.is_migration_complete.write(true);
-        }
-
-        fn get_migration_status(self: @ContractState) -> bool {
-            self.is_migration_complete.read()
-        }
-
-        fn set_push_core_address(ref self: ContractState, core_address: felt252) {
+        fn set_push_core_address(ref self: ContractState, core_address: EthAddress) {
             self.ownable.assert_only_owner();
             self.push_core_address.write(core_address);
         }
 
-        fn get_push_core_address(self: @ContractState) -> felt252 {
+        fn get_push_core_address(self: @ContractState) -> EthAddress {
             self.push_core_address.read()
         }
 
