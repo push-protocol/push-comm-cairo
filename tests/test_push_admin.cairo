@@ -42,7 +42,7 @@ fn test_gov_address() {
     let contract_address = deploy_contract();
     let push_comm = IPushCommDispatcher { contract_address };
 
-    let GOV_ADDRESS: felt252 = 'some addrs';
+    let GOV_ADDRESS: ContractAddress = 'some addrs'.try_into().unwrap();
 
     // admin sets the migration status
     cheat_caller_address(contract_address, PUSH_ADMIN(), CheatSpan::TargetCalls(1));
@@ -57,7 +57,7 @@ fn test_push_token_address() {
     let contract_address = deploy_contract();
     let push_comm = IPushCommDispatcher { contract_address };
 
-    let TOKEN_ADDRESS: felt252 = 'some addrs';
+    let TOKEN_ADDRESS: ContractAddress = 'user_1'.try_into().unwrap();
 
     // admin sets the migration status
     cheat_caller_address(contract_address, PUSH_ADMIN(), CheatSpan::TargetCalls(1));

@@ -42,10 +42,10 @@ pub mod PushComm {
         // Channels
         delegatedNotificationSenders: Map<ContractAddress, Map<ContractAddress, bool>>,
         // Contract State
-        governance: felt252,
+        governance: ContractAddress,
         is_migration_complete: bool,
         push_core_address: felt252,
-        push_token_address: felt252,
+        push_token_address: ContractAddress,
         // Chain Info
         chain_name: felt252,
         chain_id: felt252,
@@ -132,12 +132,18 @@ pub mod PushComm {
 
 
     #[constructor]
-    fn constructor(ref self: ContractState, owner: ContractAddress, chain_name: felt252) {
-        // Set the initial owner of the contract
-        self.ownable.initializer(owner);
+    fn constructor(
+        ref self: ContractState,
+        owner: ContractAddress,
+        push_governance: ContractAddress,
+        chain_name: felt252
+    ) {
         let chain_id = get_execution_info().unbox().tx_info.unbox().chain_id;
+
+        self.ownable.initializer(owner);
         self.chain_id.write(chain_id);
         self.chain_name.write(chain_name);
+        self.governance.write(push_governance);
     }
 
     #[generate_trait]
@@ -343,21 +349,23 @@ pub mod PushComm {
 
 
         // Infos
-        fn set_push_governance_address(ref self: ContractState, governance_address: felt252) {
+        fn set_push_governance_address(
+            ref self: ContractState, governance_address: ContractAddress
+        ) {
             self.ownable.assert_only_owner();
             self.governance.write(governance_address);
         }
 
-        fn get_push_governance_address(self: @ContractState) -> felt252 {
+        fn get_push_governance_address(self: @ContractState) -> ContractAddress {
             self.governance.read()
         }
 
-        fn set_push_token_address(ref self: ContractState, push_token_address: felt252) {
+        fn set_push_token_address(ref self: ContractState, push_token_address: ContractAddress) {
             self.ownable.assert_only_owner();
             self.push_token_address.write(push_token_address);
         }
 
-        fn get_push_token_address(self: @ContractState) -> felt252 {
+        fn get_push_token_address(self: @ContractState) -> ContractAddress {
             self.push_token_address.read()
         }
     }
