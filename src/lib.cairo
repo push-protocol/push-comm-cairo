@@ -6,6 +6,7 @@ pub use interface::IPushComm;
 
 #[starknet::contract]
 pub mod PushComm {
+    use core::box::BoxTrait;
     use core::clone::Clone;
     use core::num::traits::zero::Zero;
     use push_comm::IPushComm;
@@ -131,11 +132,10 @@ pub mod PushComm {
 
 
     #[constructor]
-    fn constructor(
-        ref self: ContractState, owner: ContractAddress, chain_id: felt252, chain_name: felt252
-    ) {
+    fn constructor(ref self: ContractState, owner: ContractAddress, chain_name: felt252) {
         // Set the initial owner of the contract
         self.ownable.initializer(owner);
+        let chain_id = get_execution_info().unbox().tx_info.unbox().chain_id;
         self.chain_id.write(chain_id);
         self.chain_name.write(chain_name);
     }

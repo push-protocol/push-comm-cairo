@@ -5,7 +5,7 @@ use snforge_std::{
     EventSpyAssertionsTrait, Event, EventSpyTrait
 };
 use push_comm::{PushComm, interface::IPushCommDispatcher, interface::IPushCommDispatcherTrait};
-use super::common::{USER_1, deploy_contract, CHAIN_NAME, CHAIN_ID};
+use super::common::{USER_1, deploy_contract, CHAIN_NAME};
 
 #[test]
 fn test_verify_channel_alias() {
