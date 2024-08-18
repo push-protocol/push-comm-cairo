@@ -19,6 +19,7 @@ pub fn CHAIN_NAME() -> felt252 {
     'Starknet'.try_into().unwrap()
 }
 
+
 pub fn deploy_contract() -> ContractAddress {
     let contract = declare("PushComm").unwrap();
 

@@ -1,4 +1,4 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress, EthAddress};
 
 use snforge_std::{
     declare, ContractClassTrait, cheat_caller_address, CheatSpan, spy_events,
@@ -11,7 +11,7 @@ use super::common::{USER_1, deploy_contract, CHAIN_NAME};
 fn test_verify_channel_alias() {
     let contract_address = deploy_contract();
     let push_comm = IPushCommDispatcher { contract_address };
-    let channel_address: felt252 = 'some address';
+    let channel_address: EthAddress = 'some address'.try_into().unwrap();
 
     let mut spy = spy_events();
 
