@@ -19,7 +19,7 @@ pub mod PushComm {
     use openzeppelin::access::ownable::interface::OwnableABI;
     use core::starknet::storage::StoragePointerWriteAccess;
     use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
-    use starknet::{ContractAddress, get_caller_address, EthAddress};
+    use starknet::{ContractAddress, get_caller_address, EthAddress, contract_address_const};
     use starknet::{get_execution_info};
     use openzeppelin::access::ownable::OwnableComponent;
 
@@ -140,7 +140,9 @@ pub mod PushComm {
         push_governance: ContractAddress,
         chain_name: felt252
     ) {
-        let chain_id = get_execution_info().unbox().tx_info.unbox().chain_id;
+        // TODO: fix this
+        // let chain_id = get_execution_info().unbox().tx_info.unbox().chain_id;
+        let chain_id = 1;
 
         self.ownable.initializer(owner);
         self.chain_id.write(chain_id);
@@ -182,8 +184,25 @@ pub mod PushComm {
 
                 // treat the count as index and update user struct
                 user_info.is_subscribed.write(channel, false);
+                user_info
+                    .subscribed
+                    .write(
+                        user_info.map_address_subscribed.entry(_subscribed_count).read(),
+                        user_info.subscribed.entry(channel).read()
+                    );
+                user_info
+                    .map_address_subscribed
+                    .write(
+                        user_info.subscribed.entry(channel).read(),
+                        user_info.map_address_subscribed.entry(_subscribed_count).read(),
+                    );
 
-                // TODO: handle _unsubscribe core
+                // reset the last entry
+                user_info.subscribed.write(channel, 0);
+                user_info
+                    .map_address_subscribed
+                    .write(_subscribed_count, contract_address_const::<0>());
+                user_info.subscribed_count.write(_subscribed_count);
 
                 // Emit
                 self.emit(UnSubscribe { channel: channel, user: user });
