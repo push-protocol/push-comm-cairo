@@ -228,10 +228,8 @@ pub mod PushComm {
             self: @ContractState, channel: ContractAddress, recipient: ContractAddress
         ) -> bool {
             let caller_address = get_caller_address();
-            let is_admin = self.ownable.owner() == caller_address;
 
-            if (channel.is_zero() && is_admin)
-                || (channel == caller_address)
+            if (channel == caller_address)
                 || self.delegatedNotificationSenders.entry(channel).entry(caller_address).read() {
                 return true;
             }
@@ -252,7 +250,8 @@ pub mod PushComm {
                         SendNotification {
                             channel: channel, recipient: recipient, indentity: indentity
                         }
-                    )
+                    );
+                return true;
             }
 
             false
