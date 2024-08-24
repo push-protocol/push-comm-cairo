@@ -55,8 +55,7 @@ fn test_channel_delegate() {
             ]
         );
 
-
-        // Removed Delegate can send the notification
+    // Removed Delegate can send the notification
     cheat_caller_address(contract_address, USER_1(), CheatSpan::TargetCalls(1));
     let is_success = push_comm.send_notification(CHANNEL_ADDRESS, USER_1(), indentity.clone());
     assert(is_success == false, 'Send notification should fail');
