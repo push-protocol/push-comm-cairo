@@ -6,6 +6,8 @@ pub use interface::IPushComm;
 
 #[starknet::contract]
 pub mod PushComm {
+    use core::traits::TryInto;
+    use core::serde::Serde;
     use core::box::BoxTrait;
     use core::clone::Clone;
     use core::num::traits::zero::Zero;
@@ -312,6 +314,7 @@ pub mod PushComm {
                     ChannelAlias {
                         chain_name: self.chain_name.read(),
                         chain_id: self.chain_id.read(),
+                        // chain_id: 1, //self.chain_id.read(),
                         channel_owner_address: get_caller_address(),
                         ethereum_channel_address: channel_address
                     }
