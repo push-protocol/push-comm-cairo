@@ -153,9 +153,7 @@ pub mod PushComm {
         push_governance: ContractAddress,
         chain_name: felt252
     ) {
-        // TODO: fix this
-        // let chain_id = get_execution_info().unbox().tx_info.unbox().chain_id;
-        let chain_id = 1;
+        let chain_id = get_execution_info().unbox().tx_info.unbox().chain_id;
 
         self.ownable.initializer(owner);
         self.chain_id.write(chain_id);

@@ -9,7 +9,7 @@ use super::common::{USER_1, deploy_contract, CHAIN_NAME};
 
 
 #[test]
-#[ignore]
+// #[ignore]
 fn test_verify_channel_alias() {
     let contract_address = deploy_contract();
     let push_comm = IPushCommDispatcher { contract_address };
