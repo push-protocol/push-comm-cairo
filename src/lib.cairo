@@ -295,7 +295,7 @@ pub mod PushComm {
             notif_settings: ByteArray
         ) {
             let caller_address = get_caller_address();
-            assert!(self._is_user_subscribed(channel, caller_address));
+            assert!(self._is_user_subscribed(channel, caller_address), "User not subscribed to channel");
 
             let modified_notif_settings = format!("@{}+@{}", notif_id, notif_settings);
             self
