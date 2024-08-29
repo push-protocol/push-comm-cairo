@@ -6,29 +6,37 @@ pub use interface::IPushComm;
 
 #[starknet::contract]
 pub mod PushComm {
+    use push_comm::IPushComm;
     use core::traits::TryInto;
     use core::serde::Serde;
     use core::box::BoxTrait;
     use core::clone::Clone;
     use core::num::traits::zero::Zero;
-    use push_comm::IPushComm;
     use core::starknet::event::EventEmitter;
     use core::starknet::storage::MutableStorageNode;
     use core::starknet::storage::StoragePointerReadAccess;
     use core::starknet::storage::StoragePathEntry;
-    use openzeppelin::access::ownable::interface::OwnableABI;
     use core::starknet::storage::StoragePointerWriteAccess;
     use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
     use starknet::{ContractAddress, get_caller_address, EthAddress, contract_address_const};
     use starknet::{get_execution_info};
+    use starknet::ClassHash;
+    use openzeppelin::access::ownable::interface::OwnableABI;
     use openzeppelin::access::ownable::OwnableComponent;
+    use openzeppelin::upgrades::UpgradeableComponent;
+    use openzeppelin::upgrades::interface::IUpgradeable;
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
+    component!(path: UpgradeableComponent, storage: upgradeable, event: UpgradeableEvent);
+
 
     // Ownable Mixin
     #[abi(embed_v0)]
     impl OwnableMixinImpl = OwnableComponent::OwnableMixinImpl<ContractState>;
-    impl InternalImpl = OwnableComponent::InternalImpl<ContractState>;
+    impl OwnableInternalImpl = OwnableComponent::InternalImpl<ContractState>;
+
+    // Upgradeable
+    impl UpgradeableInternalImpl = UpgradeableComponent::InternalImpl<ContractState>;
 
 
     #[storage]
@@ -36,6 +44,9 @@ pub mod PushComm {
         // Ownable
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
+        // Upgradeable
+        #[substorage(v0)]
+        upgradeable: UpgradeableComponent::Storage,
         // Users
         users: Map<ContractAddress, User>,
         users_count: u256,
@@ -69,6 +80,8 @@ pub mod PushComm {
     pub enum Event {
         #[flat]
         OwnableEvent: OwnableComponent::Event,
+        #[flat]
+        UpgradeableEvent: UpgradeableComponent::Event,
         ChannelAlias: ChannelAlias,
         Subscribe: Subscribe,
         UnSubscribe: UnSubscribe,
@@ -148,6 +161,14 @@ pub mod PushComm {
         self.chain_id.write(chain_id);
         self.chain_name.write(chain_name);
         self.governance.write(push_governance);
+    }
+
+    #[abi(embed_v0)]
+    impl UpgradeableImpl of IUpgradeable<ContractState> {
+        fn upgrade(ref self: ContractState, new_class_hash: ClassHash) {
+            self.ownable.assert_only_owner();
+            self.upgradeable.upgrade(new_class_hash);
+        }
     }
 
     #[generate_trait]
