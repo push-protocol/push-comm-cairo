@@ -14,6 +14,7 @@ fn test_verify_channel_alias() {
     let contract_address = deploy_contract();
     let push_comm = IPushCommDispatcher { contract_address };
     let channel_address: EthAddress = 'some address'.try_into().unwrap();
+    let chain_id: felt252 = 'SN_SEPOLIA'.try_into().unwrap();
 
     let mut spy = spy_events();
 
@@ -29,7 +30,7 @@ fn test_verify_channel_alias() {
                     PushComm::Event::ChannelAlias(
                         PushComm::ChannelAlias {
                             chain_name: CHAIN_NAME(),
-                            chain_id: 1,
+                            chain_id: chain_id,
                             channel_owner_address: USER_1(),
                             ethereum_channel_address: channel_address
                         }

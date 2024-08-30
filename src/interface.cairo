@@ -33,4 +33,5 @@ pub trait IPushComm<TContractState> {
     fn unsubscribe(ref self: TContractState, channel: ContractAddress);
     fn batch_subscribe(ref self: TContractState, channels: Array<ContractAddress>);
     fn batch_unsubscribe(ref self: TContractState, channels: Array<ContractAddress>);
+    fn chain_id(self: @TContractState) -> felt252;
 }

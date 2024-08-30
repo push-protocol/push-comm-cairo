@@ -41,7 +41,7 @@ fn test_channel_channel_user_settings() {
 }
 
 #[test]
-#[should_panic(expected:"User not subscribed to channel")]
+#[should_panic(expected: "User not subscribed to channel")]
 fn test_channel_channel_unsubscribed_user_settings() {
     let contract_address = deploy_contract();
     let push_comm = IPushCommDispatcher { contract_address };

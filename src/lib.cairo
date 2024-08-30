@@ -65,10 +65,9 @@ pub mod PushComm {
 
     #[starknet::storage_node]
     pub struct User {
-        is_activated: bool,
-        // TODO: optimized packing
-        start_block: u64,
         subscribed_count: u256,
+        start_block: u64,
+        is_activated: bool,
         is_subscribed: Map<ContractAddress, bool>,
         subscribed: Map<ContractAddress, u256>,
         map_address_subscribed: Map<u256, ContractAddress>,
@@ -313,7 +312,9 @@ pub mod PushComm {
             notif_settings: ByteArray
         ) {
             let caller_address = get_caller_address();
-            assert!(self._is_user_subscribed(channel, caller_address), "User not subscribed to channel");
+            assert!(
+                self._is_user_subscribed(channel, caller_address), "User not subscribed to channel"
+            );
 
             let modified_notif_settings = format!("@{}+@{}", notif_id, notif_settings);
             self
@@ -350,7 +351,6 @@ pub mod PushComm {
                     ChannelAlias {
                         chain_name: self.chain_name.read(),
                         chain_id: self.chain_id.read(),
-                        // chain_id: 1, //self.chain_id.read(),
                         channel_owner_address: get_caller_address(),
                         ethereum_channel_address: channel_address
                     }
@@ -398,6 +398,10 @@ pub mod PushComm {
 
         fn get_push_token_address(self: @ContractState) -> ContractAddress {
             self.push_token_address.read()
+        }
+
+        fn chain_id(self: @ContractState) -> felt252 {
+            self.chain_id.read()
         }
     }
 }
