@@ -56,7 +56,6 @@ pub mod PushComm {
         delegated_notification_senders: Map<ContractAddress, Map<ContractAddress, bool>>,
         // Contract State
         governance: ContractAddress,
-        is_migration_complete: bool,
         push_core_address: EthAddress,
         push_token_address: ContractAddress,
         // Chain Info
