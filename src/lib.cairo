@@ -53,10 +53,9 @@ pub mod PushComm {
         map_address_users: Map<u256, ContractAddress>,
         user_to_channel_notifs: Map<ContractAddress, Map<ContractAddress, ByteArray>>,
         // Channels
-        delegatedNotificationSenders: Map<ContractAddress, Map<ContractAddress, bool>>,
+        delegated_notification_senders: Map<ContractAddress, Map<ContractAddress, bool>>,
         // Contract State
         governance: ContractAddress,
-        is_migration_complete: bool,
         push_core_address: EthAddress,
         push_token_address: ContractAddress,
         // Chain Info
@@ -249,7 +248,7 @@ pub mod PushComm {
             let caller_address = get_caller_address();
 
             if (channel == caller_address)
-                || self.delegatedNotificationSenders.entry(channel).entry(caller_address).read() {
+                || self.delegated_notification_senders.entry(channel).entry(caller_address).read() {
                 return true;
             }
 
@@ -360,13 +359,13 @@ pub mod PushComm {
 
         fn add_delegate(ref self: ContractState, delegate: ContractAddress) {
             let channel = get_caller_address();
-            self.delegatedNotificationSenders.entry(channel).write(delegate, true);
+            self.delegated_notification_senders.entry(channel).write(delegate, true);
             self.emit(AddDelegate { channel: channel, delegate: delegate });
         }
 
         fn remove_delegate(ref self: ContractState, delegate: ContractAddress) {
             let channel = get_caller_address();
-            self.delegatedNotificationSenders.entry(channel).write(delegate, false);
+            self.delegated_notification_senders.entry(channel).write(delegate, false);
             self.emit(RemoveDelegate { channel: channel, delegate: delegate });
         }
 
