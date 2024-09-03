@@ -13,7 +13,7 @@ fn test_channel_delegate() {
     let contract_address = deploy_contract();
     let push_comm = IPushCommDispatcher { contract_address };
     let CHANNEL_ADDRESS: ContractAddress = 'some addrs'.try_into().unwrap();
-    let indentity: ByteArray = "identity";
+    let identity: ByteArray = "identity";
     let mut spy = spy_events();
 
     // Channel owner set the delegate
@@ -35,7 +35,7 @@ fn test_channel_delegate() {
 
     // Delegate can send the notification
     cheat_caller_address(contract_address, USER_1(), CheatSpan::TargetCalls(1));
-    let is_success = push_comm.send_notification(CHANNEL_ADDRESS, USER_1(), indentity.clone());
+    let is_success = push_comm.send_notification(CHANNEL_ADDRESS, USER_1(), identity.clone());
     assert(is_success, 'Send notification failed');
 
     // Channel owner remove the delegate
@@ -57,6 +57,6 @@ fn test_channel_delegate() {
 
     // Removed Delegate can send the notification
     cheat_caller_address(contract_address, USER_1(), CheatSpan::TargetCalls(1));
-    let is_success = push_comm.send_notification(CHANNEL_ADDRESS, USER_1(), indentity.clone());
+    let is_success = push_comm.send_notification(CHANNEL_ADDRESS, USER_1(), identity.clone());
     assert(is_success == false, 'Send notification should fail');
 }

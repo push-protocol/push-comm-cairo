@@ -91,9 +91,10 @@ pub mod PushComm {
 
     #[derive(Drop, starknet::Event)]
     pub struct ChannelAlias {
-        #[key]
         pub chain_name: felt252,
+        #[key]
         pub chain_id: felt252,
+        #[key]
         pub channel_owner_address: ContractAddress,
         pub ethereum_channel_address: EthAddress,
     }
@@ -102,6 +103,7 @@ pub mod PushComm {
     pub struct Subscribe {
         #[key]
         pub channel: ContractAddress,
+        #[key]
         pub user: ContractAddress,
     }
 
@@ -109,6 +111,7 @@ pub mod PushComm {
     pub struct UnSubscribe {
         #[key]
         pub channel: ContractAddress,
+        #[key]
         pub user: ContractAddress,
     }
 
@@ -116,6 +119,7 @@ pub mod PushComm {
     pub struct AddDelegate {
         #[key]
         pub channel: ContractAddress,
+        #[key]
         pub delegate: ContractAddress,
     }
 
@@ -123,6 +127,7 @@ pub mod PushComm {
     pub struct RemoveDelegate {
         #[key]
         pub channel: ContractAddress,
+        #[key]
         pub delegate: ContractAddress,
     }
 
@@ -130,19 +135,20 @@ pub mod PushComm {
     pub struct SendNotification {
         #[key]
         pub channel: ContractAddress,
+        #[key]
         pub recipient: ContractAddress,
-        pub indentity: ByteArray,
+        pub identity: ByteArray,
     }
 
     #[derive(Drop, starknet::Event)]
     pub struct UserNotifcationSettingsAdded {
         #[key]
         pub channel: ContractAddress,
+        #[key]
         pub recipient: ContractAddress,
         pub notif_id: u256,
         pub notif_settings: ByteArray,
     }
-
 
     #[constructor]
     fn constructor(
@@ -258,14 +264,14 @@ pub mod PushComm {
             ref self: ContractState,
             channel: ContractAddress,
             recipient: ContractAddress,
-            indentity: ByteArray
+            identity: ByteArray
         ) -> bool {
             let success = self._check_notif_req(channel, recipient);
             if success {
                 self
                     .emit(
                         SendNotification {
-                            channel: channel, recipient: recipient, indentity: indentity
+                            channel: channel, recipient: recipient, identity: identity
                         }
                     );
                 return true;
