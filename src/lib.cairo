@@ -137,7 +137,7 @@ pub mod PushComm {
         pub channel: ContractAddress,
         #[key]
         pub recipient: ContractAddress,
-        pub indentity: ByteArray,
+        pub identity: ByteArray,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -264,14 +264,14 @@ pub mod PushComm {
             ref self: ContractState,
             channel: ContractAddress,
             recipient: ContractAddress,
-            indentity: ByteArray
+            identity: ByteArray
         ) -> bool {
             let success = self._check_notif_req(channel, recipient);
             if success {
                 self
                     .emit(
                         SendNotification {
-                            channel: channel, recipient: recipient, indentity: indentity
+                            channel: channel, recipient: recipient, identity: identity
                         }
                     );
                 return true;
