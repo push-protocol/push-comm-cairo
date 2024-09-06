@@ -1,10 +1,7 @@
 #!/bin/bash
 
-# Hardcoded URLs for testnet and mainnet
-TESTNET_RPC_URL="https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/DREO8_wnqH5xVktl2m9llAi7X0525BqH"
-MAINNET_RPC_URL=""
-
-DEFAULT_FEE_TOKEN="eth"
+# Load environment variables from .env file
+export $(grep -v '^#' ../.env | xargs)
 
 # Function to print usage information
 print_usage() {
@@ -68,4 +65,4 @@ sncast --url "$url" \
        deploy \
        --fee-token "$fee_token" \
        --class-hash "$class_hash" \
-       --constructor-calldata $constructor_calldata
+       --constructor-calldata "$constructor_calldata"
