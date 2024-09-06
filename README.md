@@ -26,7 +26,6 @@ Make sure to update the `.env` file with the correct RPC URLs and fee token.
 
     ```bash
     bash sh/declare.sh -n <network> -k <keystore> -a <account> -c <contract_name>
-    
 
 2. **Deploy the Contract**
 
