@@ -1,4 +1,4 @@
-# push-cairo-smart-contracts
+# comm-cairo-smart-contracts
 
 This is a Cairo implementation for the Push Comm Contract.
 
