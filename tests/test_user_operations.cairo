@@ -19,9 +19,15 @@ fn test_user_subscription_ops() {
     let is_user_subscribed = push_comm.is_user_subscribed(CHANNEL_ADDRESS, USER_1());
     assert(is_user_subscribed == false, 'Initally user is not subscribed');
 
+    let users_count_before_subscription = push_comm.users_count();
+
     // user subscribes to the channel
     cheat_caller_address(contract_address, USER_1(), CheatSpan::TargetCalls(1));
     push_comm.subscribe(CHANNEL_ADDRESS);
+
+    // users_count should increase
+    let users_count_after_subscription = push_comm.users_count();
+    assert(users_count_before_subscription + 1 == users_count_after_subscription, 'Users count not increased');
 
     // user should be subscribed to the channel
     let is_user_subscribed = push_comm.is_user_subscribed(CHANNEL_ADDRESS, USER_1());

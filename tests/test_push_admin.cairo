@@ -15,7 +15,7 @@ fn test_admin_sets_core_contract_address() {
     cheat_caller_address(contract_address, PUSH_ADMIN(), CheatSpan::TargetCalls(1));
     push_comm.set_push_core_address(CORE_ADDRESS);
 
-    let UPDATED_ADDRESS = push_comm.get_push_core_address();
+    let UPDATED_ADDRESS = push_comm.push_core_address();
     assert(CORE_ADDRESS == UPDATED_ADDRESS, 'Core Contract Update Failed');
 }
 
@@ -43,7 +43,7 @@ fn test_admin_set_gov_address() {
     cheat_caller_address(contract_address, PUSH_ADMIN(), CheatSpan::TargetCalls(1));
     push_comm.set_push_governance_address(GOV_ADDRESS);
 
-    let UPDATED_ADDRESS = push_comm.get_push_governance_address();
+    let UPDATED_ADDRESS = push_comm.push_governance_address();
     assert(GOV_ADDRESS == UPDATED_ADDRESS, 'Core Contract Update Failed');
 }
 
@@ -71,7 +71,7 @@ fn test_admin_set_push_token_address() {
     cheat_caller_address(contract_address, PUSH_ADMIN(), CheatSpan::TargetCalls(1));
     push_comm.set_push_governance_address(TOKEN_ADDRESS);
 
-    let UPDATED_ADDRESS = push_comm.get_push_governance_address();
+    let UPDATED_ADDRESS = push_comm.push_governance_address();
     assert(TOKEN_ADDRESS == UPDATED_ADDRESS, 'Core Contract Update Failed');
 }
 

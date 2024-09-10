@@ -24,6 +24,10 @@ fn test_channel_channel_user_settings() {
     let notif_settings: ByteArray = "notif_settings";
     push_comm.change_user_channel_settings(CHANNEL_ADDRESS, notif_id, notif_settings.clone());
 
+    let modified_notif_settings = format!("@{}+@{}", notif_id, notif_settings);
+    let setting_saved = push_comm.user_to_channel_notifs(USER_1(), CHANNEL_ADDRESS);
+    assert(setting_saved == modified_notif_settings, 'Settings saved');
+
     // Assert UserNotifcationSettingsAdded event was emitted
     spy
         .assert_emitted(

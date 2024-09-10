@@ -285,12 +285,6 @@ pub mod PushComm {
     #[abi(embed_v0)]
     impl PushComm of super::IPushComm<ContractState> {
         // User
-        fn is_user_subscribed(
-            self: @ContractState, channel: ContractAddress, user: ContractAddress
-        ) -> bool {
-            self._is_user_subscribed(channel, user)
-        }
-
         fn subscribe(ref self: ContractState, channel: ContractAddress) {
             self._subscribe(channel, get_caller_address());
         }
@@ -346,10 +340,6 @@ pub mod PushComm {
             self.push_core_address.write(core_address);
         }
 
-        fn get_push_core_address(self: @ContractState) -> EthAddress {
-            self.push_core_address.read()
-        }
-
         // Channel
         fn verify_channel_alias(ref self: ContractState, channel_address: EthAddress) {
             self
@@ -384,8 +374,6 @@ pub mod PushComm {
             self._send_notification(channel, recipient, identity)
         }
 
-
-        // Infos
         fn set_push_governance_address(
             ref self: ContractState, governance_address: ContractAddress
         ) {
@@ -393,21 +381,52 @@ pub mod PushComm {
             self.governance.write(governance_address);
         }
 
-        fn get_push_governance_address(self: @ContractState) -> ContractAddress {
-            self.governance.read()
-        }
-
         fn set_push_token_address(ref self: ContractState, push_token_address: ContractAddress) {
             self.ownable.assert_only_owner();
             self.push_token_address.write(push_token_address);
         }
 
-        fn get_push_token_address(self: @ContractState) -> ContractAddress {
+        // Getters Functions
+        fn push_core_address(self: @ContractState) -> EthAddress {
+            self.push_core_address.read()
+        }
+
+        fn push_token_address(self: @ContractState) -> ContractAddress {
             self.push_token_address.read()
+        }
+
+        fn is_user_subscribed(
+            self: @ContractState, channel: ContractAddress, user: ContractAddress
+        ) -> bool {
+            self._is_user_subscribed(channel, user)
+        }
+
+        fn users_count(self: @ContractState) -> u256 {
+            self.users_count.read()
         }
 
         fn chain_id(self: @ContractState) -> felt252 {
             self.chain_id.read()
+        }
+
+        fn push_governance_address(self: @ContractState) -> ContractAddress {
+            self.governance.read()
+        }
+
+        fn chain_name(self: @ContractState) -> felt252 {
+            self.chain_name.read()
+        }
+
+        fn user_to_channel_notifs(self: @ContractState, user: ContractAddress, channel: ContractAddress) -> ByteArray {
+            self.user_to_channel_notifs.entry(user).entry(channel).read()
+        }
+
+        fn map_address_users(self: @ContractState, index: u256) -> ContractAddress {
+            self.map_address_users.entry(index).read()
+        }
+
+        fn delegated_notification_senders(self: @ContractState, channel: ContractAddress, delegate: ContractAddress) -> bool {
+            self.delegated_notification_senders.entry(channel).entry(delegate).read()
         }
     }
 }

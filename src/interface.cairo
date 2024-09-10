@@ -4,11 +4,9 @@ use starknet::{ContractAddress, EthAddress};
 pub trait IPushComm<TContractState> {
     // Push Admin
     fn set_push_core_address(ref self: TContractState, core_address: EthAddress);
-    fn get_push_core_address(self: @TContractState) -> EthAddress;
-    fn get_push_governance_address(self: @TContractState) -> ContractAddress;
     fn set_push_governance_address(ref self: TContractState, governance_address: ContractAddress);
-    fn get_push_token_address(self: @TContractState) -> ContractAddress;
     fn set_push_token_address(ref self: TContractState, push_token_address: ContractAddress);
+
     // Channel
     fn verify_channel_alias(ref self: TContractState, channel_address: EthAddress);
     fn add_delegate(ref self: TContractState, delegate: ContractAddress);
@@ -25,13 +23,24 @@ pub trait IPushComm<TContractState> {
         notif_id: u256,
         notif_settings: ByteArray
     );
+
     // User
-    fn is_user_subscribed(
-        self: @TContractState, channel: ContractAddress, user: ContractAddress
-    ) -> bool;
     fn subscribe(ref self: TContractState, channel: ContractAddress);
     fn unsubscribe(ref self: TContractState, channel: ContractAddress);
     fn batch_subscribe(ref self: TContractState, channels: Array<ContractAddress>);
     fn batch_unsubscribe(ref self: TContractState, channels: Array<ContractAddress>);
+
+    // New Getter Functions
+    fn is_user_subscribed(
+        self: @TContractState, channel: ContractAddress, user: ContractAddress
+    ) -> bool;
+    fn users_count(self: @TContractState) -> u256;
     fn chain_id(self: @TContractState) -> felt252;
+    fn chain_name(self: @TContractState) -> felt252;
+    fn push_core_address(self: @TContractState) -> EthAddress;
+    fn push_token_address(self: @TContractState) -> ContractAddress;
+    fn push_governance_address(self: @TContractState) -> ContractAddress;
+    fn user_to_channel_notifs(self: @TContractState, user: ContractAddress, channel: ContractAddress) -> ByteArray;
+    fn map_address_users(self: @TContractState, index: u256) -> ContractAddress;
+    fn delegated_notification_senders(self: @TContractState, channel: ContractAddress, delegate: ContractAddress) -> bool;
 }
