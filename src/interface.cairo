@@ -29,6 +29,7 @@ pub trait IPushComm<TContractState> {
     fn is_user_subscribed(
         self: @TContractState, channel: ContractAddress, user: ContractAddress
     ) -> bool;
+    fn users_count(self: @TContractState) -> u256;
     fn subscribe(ref self: TContractState, channel: ContractAddress);
     fn unsubscribe(ref self: TContractState, channel: ContractAddress);
     fn batch_subscribe(ref self: TContractState, channels: Array<ContractAddress>);

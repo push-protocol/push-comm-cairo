@@ -291,6 +291,10 @@ pub mod PushComm {
             self._is_user_subscribed(channel, user)
         }
 
+        fn users_count(self: @ContractState) -> u256 {
+            self.users_count.read()
+        }
+
         fn subscribe(ref self: ContractState, channel: ContractAddress) {
             self._subscribe(channel, get_caller_address());
         }
