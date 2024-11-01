@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load environment variables from .env file
-export $(grep -v '^#' ../.env | xargs)
+export $(grep -v '^#' .env | xargs)
 
 # Function to print usage information
 print_usage() {

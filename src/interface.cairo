@@ -3,7 +3,6 @@ use starknet::{ContractAddress, EthAddress};
 #[starknet::interface]
 pub trait IPushComm<TContractState> {
     // Push Admin
-    fn set_push_core_address(ref self: TContractState, core_address: EthAddress);
     fn set_push_governance_address(ref self: TContractState, governance_address: ContractAddress);
     fn set_push_token_address(ref self: TContractState, push_token_address: ContractAddress);
 
@@ -37,7 +36,6 @@ pub trait IPushComm<TContractState> {
     fn users_count(self: @TContractState) -> u256;
     fn chain_id(self: @TContractState) -> felt252;
     fn chain_name(self: @TContractState) -> felt252;
-    fn push_core_address(self: @TContractState) -> EthAddress;
     fn push_token_address(self: @TContractState) -> ContractAddress;
     fn push_governance_address(self: @TContractState) -> ContractAddress;
     fn user_to_channel_notifs(self: @TContractState, user: ContractAddress, channel: ContractAddress) -> ByteArray;

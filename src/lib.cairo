@@ -333,13 +333,6 @@ pub mod PushComm {
                 );
         }
 
-
-        // Admin
-        fn set_push_core_address(ref self: ContractState, core_address: EthAddress) {
-            self.ownable.assert_only_owner();
-            self.push_core_address.write(core_address);
-        }
-
         // Channel
         fn verify_channel_alias(ref self: ContractState, channel_address: EthAddress) {
             self
@@ -374,6 +367,7 @@ pub mod PushComm {
             self._send_notification(channel, recipient, identity)
         }
 
+        //Admin
         fn set_push_governance_address(
             ref self: ContractState, governance_address: ContractAddress
         ) {
@@ -387,10 +381,6 @@ pub mod PushComm {
         }
 
         // Getters Functions
-        fn push_core_address(self: @ContractState) -> EthAddress {
-            self.push_core_address.read()
-        }
-
         fn push_token_address(self: @ContractState) -> ContractAddress {
             self.push_token_address.read()
         }
