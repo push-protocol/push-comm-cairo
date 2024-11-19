@@ -60,7 +60,6 @@ pub mod PushComm {
         push_token_address: ContractAddress,
         // Chain Info
         chain_name: felt252,
-        chain_id: felt252,
     }
 
     #[starknet::storage_node]
@@ -157,10 +156,7 @@ pub mod PushComm {
         push_governance: ContractAddress,
         chain_name: felt252
     ) {
-        let chain_id = get_execution_info().unbox().tx_info.unbox().chain_id;
-
         self.ownable.initializer(owner);
-        self.chain_id.write(chain_id);
         self.chain_name.write(chain_name);
         self.governance.write(push_governance);
     }
@@ -335,11 +331,12 @@ pub mod PushComm {
 
         // Channel
         fn verify_channel_alias(ref self: ContractState, channel_address: EthAddress) {
+            let chain_id = get_execution_info().unbox().tx_info.unbox().chain_id;
             self
                 .emit(
                     ChannelAlias {
                         chain_name: self.chain_name.read(),
-                        chain_id: self.chain_id.read(),
+                        chain_id: chain_id,
                         channel_owner_address: get_caller_address(),
                         ethereum_channel_address: channel_address
                     }
@@ -393,10 +390,6 @@ pub mod PushComm {
 
         fn users_count(self: @ContractState) -> u256 {
             self.users_count.read()
-        }
-
-        fn chain_id(self: @ContractState) -> felt252 {
-            self.chain_id.read()
         }
 
         fn push_governance_address(self: @ContractState) -> ContractAddress {
