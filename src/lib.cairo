@@ -320,7 +320,7 @@ pub mod PushComm {
             self
                 .user_to_channel_notifs
                 .entry(caller_address)
-                .write(channel, modified_notif_settings);
+                .write(channel, modified_notif_settings.clone());
 
             self
                 .emit(
@@ -328,7 +328,7 @@ pub mod PushComm {
                         channel: channel,
                         recipient: caller_address,
                         notif_id: notif_id,
-                        notif_settings: notif_settings
+                        notif_settings: modified_notif_settings
                     }
                 );
         }

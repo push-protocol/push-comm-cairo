@@ -25,6 +25,7 @@ fn test_channel_channel_user_settings() {
     push_comm.change_user_channel_settings(CHANNEL_ADDRESS, notif_id, notif_settings.clone());
 
     let modified_notif_settings = format!("@{}+@{}", notif_id, notif_settings);
+    let modified_notif_settings_clone = modified_notif_settings.clone();
     let setting_saved = push_comm.user_to_channel_notifs(USER_1(), CHANNEL_ADDRESS);
     assert(setting_saved == modified_notif_settings, 'Settings saved');
 
@@ -36,7 +37,7 @@ fn test_channel_channel_user_settings() {
                     contract_address,
                     PushComm::Event::UserNotifcationSettingsAdded(
                         PushComm::UserNotifcationSettingsAdded {
-                            channel: CHANNEL_ADDRESS, recipient: USER_1(), notif_id, notif_settings
+                            channel: CHANNEL_ADDRESS, recipient: USER_1(), notif_id, notif_settings: modified_notif_settings
                         }
                     )
                 )
