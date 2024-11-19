@@ -349,6 +349,7 @@ pub mod PushComm {
         fn add_delegate(ref self: ContractState, delegate: ContractAddress) {
             let channel = get_caller_address();
             self.delegated_notification_senders.entry(channel).write(delegate, true);
+            self._subscribe(channel, delegate);
             self.emit(AddDelegate { channel: channel, delegate: delegate });
         }
 

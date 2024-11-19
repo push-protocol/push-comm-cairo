@@ -33,6 +33,10 @@ fn test_channel_delegate() {
             ]
         );
 
+    // user should be subscribed to the channel
+    let is_user_subscribed = push_comm.is_user_subscribed(CHANNEL_ADDRESS, USER_1());
+    assert(is_user_subscribed, 'Delegate should be subscribed');
+
     // Delegate can send the notification
     cheat_caller_address(contract_address, USER_1(), CheatSpan::TargetCalls(1));
     let is_success = push_comm.send_notification(CHANNEL_ADDRESS, USER_1(), identity.clone());
