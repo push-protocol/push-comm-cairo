@@ -261,6 +261,15 @@ pub mod PushComm {
             recipient: ContractAddress,
             identity: ByteArray
         ) -> bool {
+            // Define the maximum allowed bytes based on felts limit
+            let MAX_IDENTITY_BYTES_LIMIT: usize = 9145; // equivalent to 295 felts
+
+            // Check that the identity length is within the limit
+            let identity_length = identity.len();
+            if identity_length > MAX_IDENTITY_BYTES_LIMIT {
+                return false;
+            }
+
             let success = self._check_notif_req(channel);
             if success {
                 self
@@ -275,7 +284,6 @@ pub mod PushComm {
             false
         }
     }
-
 
     #[abi(embed_v0)]
     impl PushComm of super::IPushComm<ContractState> {
@@ -312,6 +320,16 @@ pub mod PushComm {
             );
 
             let modified_notif_settings = format!("@{}+@{}", notif_id, notif_settings);
+
+            // Define the maximum allowed bytes based on felts limit
+            let MAX_IDENTITY_BYTES_LIMIT: usize = 9145; // equivalent to 295 felts
+
+            // Check that the notif_settings length is within the limit
+            let modified_notif_settings_length = modified_notif_settings.len();
+            assert!(
+                modified_notif_settings_length <= MAX_IDENTITY_BYTES_LIMIT, "notif_settings exceeds limit"
+            );
+
             self
                 .user_to_channel_notifs
                 .entry(caller_address)
