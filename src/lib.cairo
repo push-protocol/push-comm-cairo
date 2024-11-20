@@ -56,7 +56,6 @@ pub mod PushComm {
         delegated_notification_senders: Map<ContractAddress, Map<ContractAddress, bool>>,
         // Contract State
         governance: ContractAddress,
-        push_core_address: EthAddress,
         push_token_address: ContractAddress,
         // Chain Info
         chain_name: felt252,
@@ -86,7 +85,7 @@ pub mod PushComm {
         AddDelegate: AddDelegate,
         RemoveDelegate: RemoveDelegate,
         SendNotification: SendNotification,
-        UserNotifcationSettingsAdded: UserNotifcationSettingsAdded
+        UserNotificationSettingsAdded: UserNotificationSettingsAdded
     }
 
     #[derive(Drop, starknet::Event)]
@@ -141,7 +140,7 @@ pub mod PushComm {
     }
 
     #[derive(Drop, starknet::Event)]
-    pub struct UserNotifcationSettingsAdded {
+    pub struct UserNotificationSettingsAdded {
         #[key]
         pub channel: ContractAddress,
         #[key]
@@ -248,7 +247,7 @@ pub mod PushComm {
         }
 
         fn _check_notif_req(
-            self: @ContractState, channel: ContractAddress, recipient: ContractAddress
+            self: @ContractState, channel: ContractAddress
         ) -> bool {
             let caller_address = get_caller_address();
 
@@ -266,7 +265,7 @@ pub mod PushComm {
             recipient: ContractAddress,
             identity: ByteArray
         ) -> bool {
-            let success = self._check_notif_req(channel, recipient);
+            let success = self._check_notif_req(channel);
             if success {
                 self
                     .emit(
@@ -324,7 +323,7 @@ pub mod PushComm {
 
             self
                 .emit(
-                    UserNotifcationSettingsAdded {
+                    UserNotificationSettingsAdded {
                         channel: channel,
                         recipient: caller_address,
                         notif_id: notif_id,
