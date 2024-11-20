@@ -15,6 +15,7 @@ pub mod PushComm {
     use openzeppelin::access::ownable::OwnableComponent;
     use openzeppelin::upgrades::UpgradeableComponent;
     use openzeppelin::upgrades::interface::IUpgradeable;
+    use openzeppelin::upgrades::interface::IUpgradeAndCall;
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
     component!(path: UpgradeableComponent, storage: upgradeable, event: UpgradeableEvent);
@@ -156,6 +157,15 @@ pub mod PushComm {
         fn upgrade(ref self: ContractState, new_class_hash: ClassHash) {
             self.ownable.assert_only_owner();
             self.upgradeable.upgrade(new_class_hash);
+        }   
+    }
+
+    #[abi(embed_v0)]
+    impl UpgradeAndCallImpl of IUpgradeAndCall<ContractState> {
+        fn upgrade_and_call(ref self: ContractState, new_class_hash: ClassHash, selector: felt252,
+            calldata: Span<felt252>) -> Span<felt252> {
+            self.ownable.assert_only_owner();
+            self.upgradeable.upgrade_and_call(new_class_hash, selector, calldata)
         }
     }
 
