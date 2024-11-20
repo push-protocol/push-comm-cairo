@@ -1,30 +1,21 @@
 pub mod interface;
-
-use starknet::{ContractAddress};
 pub use interface::IPushComm;
-
 
 #[starknet::contract]
 pub mod PushComm {
-    use push_comm::IPushComm;
-    use core::traits::TryInto;
-    use core::serde::Serde;
     use core::box::BoxTrait;
-    use core::clone::Clone;
-    use core::num::traits::zero::Zero;
     use core::starknet::event::EventEmitter;
-    use core::starknet::storage::MutableStorageNode;
     use core::starknet::storage::StoragePointerReadAccess;
     use core::starknet::storage::StoragePathEntry;
     use core::starknet::storage::StoragePointerWriteAccess;
-    use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
+    use starknet::storage::{Map, StorageMapWriteAccess};
     use starknet::{ContractAddress, get_caller_address, EthAddress, contract_address_const};
     use starknet::{get_execution_info};
     use starknet::ClassHash;
-    use openzeppelin::access::ownable::interface::OwnableABI;
     use openzeppelin::access::ownable::OwnableComponent;
     use openzeppelin::upgrades::UpgradeableComponent;
     use openzeppelin::upgrades::interface::IUpgradeable;
+    use openzeppelin::upgrades::interface::IUpgradeAndCall;
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
     component!(path: UpgradeableComponent, storage: upgradeable, event: UpgradeableEvent);
@@ -59,7 +50,6 @@ pub mod PushComm {
         push_token_address: ContractAddress,
         // Chain Info
         chain_name: felt252,
-        chain_id: felt252,
     }
 
     #[starknet::storage_node]
@@ -156,10 +146,7 @@ pub mod PushComm {
         push_governance: ContractAddress,
         chain_name: felt252
     ) {
-        let chain_id = get_execution_info().unbox().tx_info.unbox().chain_id;
-
         self.ownable.initializer(owner);
-        self.chain_id.write(chain_id);
         self.chain_name.write(chain_name);
         self.governance.write(push_governance);
     }
@@ -169,6 +156,15 @@ pub mod PushComm {
         fn upgrade(ref self: ContractState, new_class_hash: ClassHash) {
             self.ownable.assert_only_owner();
             self.upgradeable.upgrade(new_class_hash);
+        }   
+    }
+
+    #[abi(embed_v0)]
+    impl UpgradeAndCallImpl of IUpgradeAndCall<ContractState> {
+        fn upgrade_and_call(ref self: ContractState, new_class_hash: ClassHash, selector: felt252,
+            calldata: Span<felt252>) -> Span<felt252> {
+            self.ownable.assert_only_owner();
+            self.upgradeable.upgrade_and_call(new_class_hash, selector, calldata)
         }
     }
 
@@ -319,7 +315,7 @@ pub mod PushComm {
             self
                 .user_to_channel_notifs
                 .entry(caller_address)
-                .write(channel, modified_notif_settings);
+                .write(channel, modified_notif_settings.clone());
 
             self
                 .emit(
@@ -327,18 +323,19 @@ pub mod PushComm {
                         channel: channel,
                         recipient: caller_address,
                         notif_id: notif_id,
-                        notif_settings: notif_settings
+                        notif_settings: modified_notif_settings
                     }
                 );
         }
 
         // Channel
         fn verify_channel_alias(ref self: ContractState, channel_address: EthAddress) {
+            let chain_id = get_execution_info().unbox().tx_info.unbox().chain_id;
             self
                 .emit(
                     ChannelAlias {
                         chain_name: self.chain_name.read(),
-                        chain_id: self.chain_id.read(),
+                        chain_id: chain_id,
                         channel_owner_address: get_caller_address(),
                         ethereum_channel_address: channel_address
                     }
@@ -347,14 +344,20 @@ pub mod PushComm {
 
         fn add_delegate(ref self: ContractState, delegate: ContractAddress) {
             let channel = get_caller_address();
-            self.delegated_notification_senders.entry(channel).write(delegate, true);
-            self.emit(AddDelegate { channel: channel, delegate: delegate });
+            
+            if !self.delegated_notification_senders.entry(channel).entry(delegate).read() {
+                self.delegated_notification_senders.entry(channel).write(delegate, true);
+                self.emit(AddDelegate { channel: channel, delegate: delegate });
+            } 
         }
 
         fn remove_delegate(ref self: ContractState, delegate: ContractAddress) {
             let channel = get_caller_address();
-            self.delegated_notification_senders.entry(channel).write(delegate, false);
-            self.emit(RemoveDelegate { channel: channel, delegate: delegate });
+
+            if self.delegated_notification_senders.entry(channel).entry(delegate).read() {
+                self.delegated_notification_senders.entry(channel).write(delegate, false);
+                self.emit(RemoveDelegate { channel: channel, delegate: delegate });
+            }
         }
 
         fn send_notification(
@@ -392,10 +395,6 @@ pub mod PushComm {
 
         fn users_count(self: @ContractState) -> u256 {
             self.users_count.read()
-        }
-
-        fn chain_id(self: @ContractState) -> felt252 {
-            self.chain_id.read()
         }
 
         fn push_governance_address(self: @ContractState) -> ContractAddress {

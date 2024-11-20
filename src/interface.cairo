@@ -34,7 +34,6 @@ pub trait IPushComm<TContractState> {
         self: @TContractState, channel: ContractAddress, user: ContractAddress
     ) -> bool;
     fn users_count(self: @TContractState) -> u256;
-    fn chain_id(self: @TContractState) -> felt252;
     fn chain_name(self: @TContractState) -> felt252;
     fn push_token_address(self: @TContractState) -> ContractAddress;
     fn push_governance_address(self: @TContractState) -> ContractAddress;
