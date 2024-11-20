@@ -35,8 +35,8 @@ fn test_channel_channel_user_settings() {
             @array![
                 (
                     contract_address,
-                    PushComm::Event::UserNotifcationSettingsAdded(
-                        PushComm::UserNotifcationSettingsAdded {
+                    PushComm::Event::UserNotificationSettingsAdded(
+                        PushComm::UserNotificationSettingsAdded {
                             channel: CHANNEL_ADDRESS, recipient: USER_1(), notif_id, notif_settings: modified_notif_settings
                         }
                     )
