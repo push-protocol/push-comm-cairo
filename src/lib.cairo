@@ -1,27 +1,17 @@
 pub mod interface;
-
-use starknet::{ContractAddress};
 pub use interface::IPushComm;
-
 
 #[starknet::contract]
 pub mod PushComm {
-    use push_comm::IPushComm;
-    use core::traits::TryInto;
-    use core::serde::Serde;
     use core::box::BoxTrait;
-    use core::clone::Clone;
-    use core::num::traits::zero::Zero;
     use core::starknet::event::EventEmitter;
-    use core::starknet::storage::MutableStorageNode;
     use core::starknet::storage::StoragePointerReadAccess;
     use core::starknet::storage::StoragePathEntry;
     use core::starknet::storage::StoragePointerWriteAccess;
-    use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
+    use starknet::storage::{Map, StorageMapWriteAccess};
     use starknet::{ContractAddress, get_caller_address, EthAddress, contract_address_const};
     use starknet::{get_execution_info};
     use starknet::ClassHash;
-    use openzeppelin::access::ownable::interface::OwnableABI;
     use openzeppelin::access::ownable::OwnableComponent;
     use openzeppelin::upgrades::UpgradeableComponent;
     use openzeppelin::upgrades::interface::IUpgradeable;
