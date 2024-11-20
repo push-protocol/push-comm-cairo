@@ -348,14 +348,20 @@ pub mod PushComm {
 
         fn add_delegate(ref self: ContractState, delegate: ContractAddress) {
             let channel = get_caller_address();
-            self.delegated_notification_senders.entry(channel).write(delegate, true);
-            self.emit(AddDelegate { channel: channel, delegate: delegate });
+            
+            if !self.delegated_notification_senders.entry(channel).entry(delegate).read() {
+                self.delegated_notification_senders.entry(channel).write(delegate, true);
+                self.emit(AddDelegate { channel: channel, delegate: delegate });
+            } 
         }
 
         fn remove_delegate(ref self: ContractState, delegate: ContractAddress) {
             let channel = get_caller_address();
-            self.delegated_notification_senders.entry(channel).write(delegate, false);
-            self.emit(RemoveDelegate { channel: channel, delegate: delegate });
+
+            if self.delegated_notification_senders.entry(channel).entry(delegate).read() {
+                self.delegated_notification_senders.entry(channel).write(delegate, false);
+                self.emit(RemoveDelegate { channel: channel, delegate: delegate });
+            }
         }
 
         fn send_notification(
