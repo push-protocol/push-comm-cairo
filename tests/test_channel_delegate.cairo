@@ -1,11 +1,11 @@
-use starknet::{ContractAddress, EthAddress};
+use starknet::{ContractAddress};
 
 use snforge_std::{
-    declare, ContractClassTrait, cheat_caller_address, CheatSpan, spy_events,
-    EventSpyAssertionsTrait, Event, EventSpyTrait
+    cheat_caller_address, CheatSpan, spy_events,
+    EventSpyAssertionsTrait
 };
 use push_comm::{PushComm, interface::IPushCommDispatcher, interface::IPushCommDispatcherTrait};
-use super::common::{USER_1, deploy_contract, CHAIN_NAME};
+use super::common::{USER_1, deploy_contract};
 
 
 #[test]

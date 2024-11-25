@@ -5,6 +5,8 @@ pub trait IPushComm<TContractState> {
     // Push Admin
     fn set_push_governance_address(ref self: TContractState, governance_address: ContractAddress);
     fn set_push_token_address(ref self: TContractState, push_token_address: ContractAddress);
+    fn set_chain_name(ref self: TContractState, chain_name: felt252);
+    fn set_identity_bytes_limit(ref self: TContractState, limit: usize);
 
     // Channel
     fn verify_channel_alias(ref self: TContractState, channel_address: EthAddress);
@@ -35,6 +37,7 @@ pub trait IPushComm<TContractState> {
     ) -> bool;
     fn users_count(self: @TContractState) -> u256;
     fn chain_name(self: @TContractState) -> felt252;
+    fn identity_bytes_limit(self: @TContractState) -> usize;
     fn push_token_address(self: @TContractState) -> ContractAddress;
     fn push_governance_address(self: @TContractState) -> ContractAddress;
     fn user_to_channel_notifs(self: @TContractState, user: ContractAddress, channel: ContractAddress) -> ByteArray;

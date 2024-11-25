@@ -1,11 +1,11 @@
-use starknet::{ContractAddress, EthAddress};
+use starknet::{ContractAddress};
 
 use snforge_std::{
-    declare, ContractClassTrait, cheat_caller_address, CheatSpan, spy_events,
-    EventSpyAssertionsTrait, Event, EventSpyTrait
+    cheat_caller_address, CheatSpan, spy_events,
+    EventSpyAssertionsTrait
 };
 use push_comm::{PushComm, interface::IPushCommDispatcher, interface::IPushCommDispatcherTrait};
-use super::common::{USER_1, deploy_contract, CHAIN_NAME};
+use super::common::{USER_1, deploy_contract};
 
 #[test]
 fn test_channel_channel_user_settings() {
@@ -25,7 +25,7 @@ fn test_channel_channel_user_settings() {
     push_comm.change_user_channel_settings(CHANNEL_ADDRESS, notif_id, notif_settings.clone());
 
     let modified_notif_settings = format!("@{}+@{}", notif_id, notif_settings);
-    let modified_notif_settings_clone = modified_notif_settings.clone();
+    // let modified_notif_settings_clone = modified_notif_settings.clone();
     let setting_saved = push_comm.user_to_channel_notifs(USER_1(), CHANNEL_ADDRESS);
     assert(setting_saved == modified_notif_settings, 'Settings saved');
 

@@ -50,6 +50,8 @@ pub mod PushComm {
         push_token_address: ContractAddress,
         // Chain Info
         chain_name: felt252,
+        // identity bytes limit
+        MAX_IDENTITY_BYTES_LIMIT: usize
     }
 
     #[starknet::storage_node]
@@ -149,6 +151,7 @@ pub mod PushComm {
         self.ownable.initializer(owner);
         self.chain_name.write(chain_name);
         self.governance.write(push_governance);
+        self.MAX_IDENTITY_BYTES_LIMIT.write(9145);
     }
 
     #[abi(embed_v0)]
@@ -261,12 +264,9 @@ pub mod PushComm {
             recipient: ContractAddress,
             identity: ByteArray
         ) -> bool {
-            // Define the maximum allowed bytes based on felts limit
-            let MAX_IDENTITY_BYTES_LIMIT: usize = 9145; // equivalent to 295 felts
-
             // Check that the identity length is within the limit
             let identity_length = identity.len();
-            if identity_length > MAX_IDENTITY_BYTES_LIMIT {
+            if identity_length > self.MAX_IDENTITY_BYTES_LIMIT.read() {
                 return false;
             }
 
@@ -321,13 +321,10 @@ pub mod PushComm {
 
             let modified_notif_settings = format!("@{}+@{}", notif_id, notif_settings);
 
-            // Define the maximum allowed bytes based on felts limit
-            let MAX_IDENTITY_BYTES_LIMIT: usize = 9145; // equivalent to 295 felts
-
             // Check that the notif_settings length is within the limit
             let modified_notif_settings_length = modified_notif_settings.len();
             assert!(
-                modified_notif_settings_length <= MAX_IDENTITY_BYTES_LIMIT, "notif_settings exceeds limit"
+                modified_notif_settings_length <= self.MAX_IDENTITY_BYTES_LIMIT.read(), "notif_settings exceeds limit"
             );
 
             self
@@ -400,6 +397,16 @@ pub mod PushComm {
             self.push_token_address.write(push_token_address);
         }
 
+        fn set_chain_name(ref self: ContractState, chain_name: felt252) {
+            self.ownable.assert_only_owner();
+            self.chain_name.write(chain_name);
+        }
+
+        fn set_identity_bytes_limit(ref self: ContractState, limit: usize) {
+            self.ownable.assert_only_owner();
+            self.MAX_IDENTITY_BYTES_LIMIT.write(limit);
+        }
+
         // Getters Functions
         fn push_token_address(self: @ContractState) -> ContractAddress {
             self.push_token_address.read()
@@ -421,6 +428,10 @@ pub mod PushComm {
 
         fn chain_name(self: @ContractState) -> felt252 {
             self.chain_name.read()
+        }
+
+        fn identity_bytes_limit(self: @ContractState) -> usize {
+            self.MAX_IDENTITY_BYTES_LIMIT.read()
         }
 
         fn user_to_channel_notifs(self: @ContractState, user: ContractAddress, channel: ContractAddress) -> ByteArray {

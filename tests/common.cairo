@@ -1,5 +1,5 @@
 use starknet::ContractAddress;
-use snforge_std::{declare, ContractClassTrait, cheat_caller_address, CheatSpan};
+use snforge_std::{declare, ContractClassTrait};
 
 // Constants
 pub fn PUSH_ADMIN() -> ContractAddress {
